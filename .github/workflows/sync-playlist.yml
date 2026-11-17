@@ -1,0 +1,39 @@
+name: 유튜브 레시피 재생목록 자동 동기화
+
+on:
+  schedule:
+    # 매일 한국시간 오전 9시 & 오후 9시 자동 확인
+    - cron: '0 0,12 * * *'
+  workflow_dispatch: # GitHub Actions 탭에서 수동 즉시 실행 가능
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 유튜브 재생목록 신규 영상 확인 및 레시피 추출
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/sync_playlist.py
+
+      - name: 변경 사항 자동 커밋 및 푸시
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -n $(git status --porcelain) ]]; then
+            git add recipes-backup.json index.html
+            git commit -m "chore: 유튜브 재생목록 신규 레시피 자동 동기화"
+            git push
+          else
+            echo "새로 추가된 레시피가 없습니다."
+          fi

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yt-recipes-pwa-v1';
+const CACHE_NAME = 'yt-recipes-pwa-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -23,20 +23,18 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
+// Network-first for HTML and JSON so updates & new playlist recipes appear immediately
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      const networked = fetch(event.request)
-        .then(resp => {
-          if (resp && resp.status === 200 && resp.type === 'basic') {
-            const clone = resp.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          }
-          return resp;
-        })
-        .catch(() => cached);
-      return cached || networked;
-    })
+    fetch(event.request)
+      .then(resp => {
+        if (resp && resp.status === 200 && resp.type === 'basic') {
+          const clone = resp.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return resp;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
