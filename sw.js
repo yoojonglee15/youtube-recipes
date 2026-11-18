@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yt-recipes-pwa-v2';
+const CACHE_NAME = 'yt-recipes-pwa-v3';
 const ASSETS = [
   './',
   './index.html',
