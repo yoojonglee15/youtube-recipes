@@ -2,8 +2,8 @@ name: 유튜브 레시피 재생목록 자동 동기화
 
 on:
   schedule:
-    # 매일 한국시간 오전 9시 & 오후 9시 자동 확인
-    - cron: '0 0,12 * * *'
+    # 30분마다 유튜브 재생목록 신규 영상 자동 확인 및 반영
+    - cron: '*/30 * * * *'
   workflow_dispatch: # GitHub Actions 탭에서 수동 즉시 실행 가능
 
 permissions:
