@@ -709,11 +709,78 @@
       border-radius: 12px;
       overflow: hidden;
       margin-bottom: 10px;
+      position: relative;
     }
     .video-box iframe {
       width: 100%;
       height: 100%;
       border: none;
+    }
+    .video-poster {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+    .video-poster img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.82;
+      transition: opacity 0.18s, transform 0.25s;
+    }
+    .video-poster:hover img {
+      opacity: 0.95;
+      transform: scale(1.02);
+    }
+    .video-play-pill {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 18px;
+      border-radius: 999px;
+      background: rgba(232, 93, 42, 0.95);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.92rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+    }
+    .chooser-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px 18px 18px;
+    }
+    .chooser-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .chooser-item:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .chooser-item .sub {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-sub);
     }
 
     .video-links {
@@ -1043,6 +1110,17 @@
               <button class="btn" style="padding:6px 10px; font-size:0.8rem;" onclick="setViewMode('card')">🖼️ 카드형</button>
             </div>
           </div>
+          <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <span style="font-size:0.84rem; font-weight:600;">기본 재생 프로그램</span>
+            <select id="playerModeSelect" class="form-input" style="width:auto; min-width:175px;" onchange="setPlayerMode(this.value)">
+              <option value="ask">매번 물어보기 (앱 선택)</option>
+              <option value="revanced">🚀 유튜브 리밴스드</option>
+              <option value="rvx">🚀 리밴스드 익스텐디드(RVX)</option>
+              <option value="embed">📺 앱 내 미니 플레이어</option>
+              <option value="youtube">▶️ 순정 유튜브 앱</option>
+              <option value="samsung">🌐 삼성 인터넷 브라우저</option>
+            </select>
+          </div>
         </div>
 
         <div class="settings-group">
@@ -1059,6 +1137,57 @@
             • 유튜브 <strong>'레시피' 재생목록</strong>에 새 영상을 추가하면 GitHub 자동 동기화 워크플로우가 매일 감지하여 레시피북에 자동 반영합니다.
           </p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player Chooser Modal ("뭘로 열까요?") -->
+  <div class="modal-backdrop" id="playerChooserModal" style="z-index:130;" onclick="if(event.target===this) closePlayerChooser()">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <h2 class="modal-title">🎬 무엇으로 영상을 재생할까요?</h2>
+        <button class="modal-close" onclick="closePlayerChooser()">✕</button>
+      </div>
+      <div class="chooser-list">
+        <button class="chooser-item" onclick="launchWithPlayer('revanced')">
+          <div>
+            <div>🚀 유튜브 리밴스드 (ReVanced)</div>
+            <div class="sub">광고 없이 리밴스드 앱으로 바로 열기</div>
+          </div>
+          <span>열기 →</span>
+        </button>
+        <button class="chooser-item" onclick="launchWithPlayer('rvx')">
+          <div>
+            <div>🚀 리밴스드 익스텐디드 (RVX)</div>
+            <div class="sub">RVX 패키지 앱으로 바로 열기</div>
+          </div>
+          <span>열기 →</span>
+        </button>
+        <button class="chooser-item" onclick="launchWithPlayer('embed')">
+          <div>
+            <div>📺 레시피북 화면 안에서 재생</div>
+            <div class="sub">앱 이동 없이 현재 창에서 바로 보기</div>
+          </div>
+          <span>재생 →</span>
+        </button>
+        <button class="chooser-item" onclick="launchWithPlayer('youtube')">
+          <div>
+            <div>▶️ 기본 유튜브 앱</div>
+            <div class="sub">순정 YouTube 앱으로 열기</div>
+          </div>
+          <span>열기 →</span>
+        </button>
+        <button class="chooser-item" onclick="launchWithPlayer('samsung')">
+          <div>
+            <div>🌐 삼성 인터넷 브라우저</div>
+            <div class="sub">삼성 브라우저 새 탭으로 열기</div>
+          </div>
+          <span>열기 →</span>
+        </button>
+        <label style="display:flex; align-items:center; gap:8px; font-size:0.83rem; font-weight:600; color:var(--text-sub); margin-top:4px; cursor:pointer;">
+          <input type="checkbox" id="rememberPlayerChk" style="width:16px; height:16px; accent-color:var(--accent);" />
+          <span>다음부터 묻지 않고 선택한 앱으로 바로 열기 (설정에서 변경 가능)</span>
+        </label>
       </div>
     </div>
   </div>
@@ -1181,11 +1310,14 @@
     const THEME_KEY = 'yt_recipes_theme';
     const VIEW_KEY = 'yt_recipes_view_mode';
     const SORT_KEY = 'yt_recipes_sort_mode';
+    const PLAYER_KEY = 'yt_recipes_player_mode';
 
     let recipes = [];
     let currentCategory = '전체';
     let currentViewMode = localStorage.getItem(VIEW_KEY) || 'list';
     let currentSortMode = localStorage.getItem(SORT_KEY) || 'newest';
+    let currentPlayerMode = localStorage.getItem(PLAYER_KEY) || 'ask';
+    let pendingVideoReq = { videoId: '', startSec: 0 };
     let currentRecipeId = null;
     let editingRecipeId = null;
     let activeTimers = [];
@@ -1224,6 +1356,8 @@
       } else {
         currentSortMode = 'newest';
       }
+      const pmEl = document.getElementById('playerModeSelect');
+      if (pmEl) pmEl.value = currentPlayerMode;
 
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -1612,11 +1746,15 @@
       `;
 
       updateDetailFavButton(r.fav);
-      loadVideoEmbed(r.videoId || r.id, 0, false);
+      const vid = r.videoId || r.id;
+      const shareUrl = r.url || `https://youtu.be/${vid}`;
+      renderVideoArea(r, 0, false);
 
       document.getElementById('videoLinks').innerHTML = `
-        ${r.url ? `<a class="btn" href="${escapeHtml(r.url)}" target="_blank" rel="noopener">▶️ 유튜브 앱으로 열기</a>` : ''}
-        ${r.channelUrl ? `<a class="btn" href="${escapeHtml(r.channelUrl)}" target="_blank" rel="noopener">🏠 채널 바로가기</a>` : ''}
+        <button class="btn btn-primary" style="padding:7px 11px; font-size:0.81rem;" onclick="openPlayerChooser('${escapeHtml(vid)}', 0)">🎬 재생 앱 선택</button>
+        <button class="btn" id="copyLinkBtn" style="padding:7px 11px; font-size:0.81rem;" onclick="copyRecipeLink('${escapeHtml(shareUrl)}')">📋 링크 복사</button>
+        <button class="btn" style="padding:7px 11px; font-size:0.81rem;" onclick="openInExternalApp('revanced', '${escapeHtml(vid)}', 0)">🚀 리밴스드</button>
+        ${r.channelUrl ? `<a class="btn" style="padding:7px 11px; font-size:0.81rem;" href="${escapeHtml(r.channelUrl)}" target="_blank" rel="noopener">🏠 채널</a>` : ''}
       `;
 
       const groups = {};
@@ -1665,24 +1803,136 @@
       document.getElementById('detailModal').classList.add('open');
     }
 
-    function loadVideoEmbed(videoId, startSec = 0, autoplay = false) {
+    function getPlayerModeLabel(mode) {
+      const labels = {
+        ask: '▶ 영상 재생 (앱 선택)',
+        revanced: '🚀 유튜브 리밴스드로 재생',
+        rvx: '🚀 리밴스드(RVX)로 재생',
+        embed: '📺 화면 안에서 바로 재생',
+        youtube: '▶️ 유튜브 앱으로 재생',
+        samsung: '🌐 삼성 브라우저로 재생'
+      };
+      return labels[mode] || '▶ 영상 재생';
+    }
+
+    function setPlayerMode(mode) {
+      currentPlayerMode = ['ask', 'revanced', 'rvx', 'embed', 'youtube', 'samsung'].includes(mode) ? mode : 'ask';
+      localStorage.setItem(PLAYER_KEY, currentPlayerMode);
+      const pmEl = document.getElementById('playerModeSelect');
+      if (pmEl) pmEl.value = currentPlayerMode;
+    }
+
+    function renderVideoArea(r, startSec = 0, forceEmbed = false) {
       const box = document.getElementById('videoBox');
+      const videoId = r.videoId || r.id;
       if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
         box.innerHTML = `<div style="color:#fff; display:flex; align-items:center; justify-content:center; height:100%;">영상 ID가 없습니다</div>`;
         return;
       }
+      if (forceEmbed || currentPlayerMode === 'embed') {
+        loadVideoEmbed(videoId, startSec, forceEmbed);
+      } else {
+        const label = getPlayerModeLabel(currentPlayerMode);
+        box.innerHTML = `<div class="video-poster" onclick="handleVideoPlayClick('${escapeHtml(videoId)}', ${startSec})">
+          <img src="${getThumbUrl(r)}" alt="${escapeHtml(r.title)}" />
+          <div class="video-play-pill">${escapeHtml(label)}</div>
+        </div>`;
+      }
+    }
+
+    function loadVideoEmbed(videoId, startSec = 0, autoplay = false) {
+      const box = document.getElementById('videoBox');
       const params = new URLSearchParams({ rel: '0', modestbranding: '1', playsinline: '1' });
       if (startSec > 0) params.set('start', String(startSec));
       if (autoplay) params.set('autoplay', '1');
       box.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?${params.toString()}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
     }
 
-    function seekVideo(videoId, sec) {
-      if (location.protocol === 'file:') {
-        window.open(`https://youtu.be/${videoId}?t=${sec}`, '_blank');
+    function handleVideoPlayClick(videoId, startSec = 0) {
+      if (currentPlayerMode === 'ask') {
+        openPlayerChooser(videoId, startSec);
+      } else if (currentPlayerMode === 'embed') {
+        loadVideoEmbed(videoId, startSec, true);
       } else {
-        loadVideoEmbed(videoId, sec, true);
+        openInExternalApp(currentPlayerMode, videoId, startSec);
       }
+    }
+
+    function openPlayerChooser(videoId, startSec = 0) {
+      pendingVideoReq = { videoId, startSec };
+      const chk = document.getElementById('rememberPlayerChk');
+      if (chk) chk.checked = false;
+      document.getElementById('playerChooserModal').classList.add('open');
+    }
+
+    function closePlayerChooser() {
+      document.getElementById('playerChooserModal').classList.remove('open');
+    }
+
+    function launchWithPlayer(mode) {
+      const chk = document.getElementById('rememberPlayerChk');
+      if (chk && chk.checked) {
+        setPlayerMode(mode);
+      }
+      const { videoId, startSec } = pendingVideoReq;
+      closePlayerChooser();
+      if (mode === 'embed') {
+        loadVideoEmbed(videoId, startSec, true);
+      } else {
+        openInExternalApp(mode, videoId, startSec);
+      }
+    }
+
+    function openInExternalApp(mode, videoId, startSec = 0) {
+      const timeParam = startSec > 0 ? `&t=${startSec}s` : '';
+      const watchPath = `www.youtube.com/watch?v=${videoId}${timeParam}`;
+      const httpsUrl = `https://${watchPath}`;
+      const isAndroid = /Android/i.test(navigator.userAgent);
+
+      if (isAndroid) {
+        const pkgMap = {
+          revanced: 'app.revanced.android.youtube',
+          rvx: 'app.rvx.android.youtube',
+          youtube: 'com.google.android.youtube',
+          samsung: 'com.sec.android.app.sbrowser'
+        };
+        const pkg = pkgMap[mode];
+        if (pkg) {
+          const intentUrl = `intent://${watchPath}#Intent;scheme=https;package=${pkg};S.browser_fallback_url=${encodeURIComponent(httpsUrl)};end`;
+          window.location.href = intentUrl;
+          return;
+        }
+      }
+      window.open(httpsUrl, '_blank', 'noopener');
+    }
+
+    async function copyRecipeLink(url) {
+      const btn = document.getElementById('copyLinkBtn');
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      if (btn) {
+        const prev = btn.textContent;
+        btn.textContent = '✅ 링크 복사됨!';
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.color = 'var(--accent)';
+        setTimeout(() => {
+          btn.textContent = prev;
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 1800);
+      }
+    }
+
+    function seekVideo(videoId, sec) {
+      handleVideoPlayClick(videoId, sec);
     }
 
     function closeDetailModal() {
