@@ -1410,8 +1410,7 @@
       const unitRe = /^([가-힣a-zA-Z0-9\s()·,]+?)\s+(\d+[./~]?\d*\s*(?:g|kg|ml|L|T|t|TS|ts|Tbsp|tsp|큰술|작은술|스푼|숟가락|컵|개|대|마리|모|봉|팩|장|알|톨|줄|줌|꼬집|조각|캔).*|약간|적당량|넉넉히|조금)$/;
       const stepRe = /^(?:\d+[.)]|[1-9]️⃣|[-•])\s*(.+)$/;
 
-      for (const raw of (descText || '').split(/?
-/)) {
+      for (const raw of (descText || '').split(/\n/)) {
         const line = raw.trim();
         if (!line || line.startsWith('#') || line.includes('http://') || line.includes('https://') || line.includes('쿠팡') || line.includes('구독') || line.includes('문의')) continue;
         if (/^[*※💡✔️]/.test(line) && line.length > 8 && !unitRe.test(line.replace(/^[*※💡✔️\s]+/, ''))) {
@@ -1437,8 +1436,7 @@
         }
       }
       if (steps.length === 0) {
-        const lines = (descText || '').split(/?
-/).map(l => l.trim()).filter(l => l && !l.startsWith('#') && !l.includes('http'));
+        const lines = (descText || '').split(/\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#') && !l.includes('http'));
         for (const l of lines.slice(0, 10)) steps.push({ text: l, ts: null, timerMin: null, tip: null });
       }
       if (steps.length === 0) {
@@ -1497,9 +1495,9 @@
       for (const vid of newVids.slice(0, 5)) {
         const vHtml = await fetchViaCorsProxy(`https://www.youtube.com/watch?v=${vid}&hl=ko`);
         if (!vHtml) continue;
-        const titleM = vHtml.match(/"videoDetails":\{[\s\S]*?"title":"((?:[^"\]|\.)*)"/);
-        const descM = vHtml.match(/"shortDescription":"((?:[^"\]|\.)*)"/);
-        const authorM = vHtml.match(/"author":"((?:[^"\]|\.)*)"/);
+        const titleM = vHtml.match(/"videoDetails":\{[\s\S]*?"title":"((?:[^"\\]|\\.)*)"/);
+        const descM = vHtml.match(/"shortDescription":"((?:[^"\\]|\\.)*)"/);
+        const authorM = vHtml.match(/"author":"((?:[^"\\]|\\.)*)"/);
         const cidM = vHtml.match(/"channelId":"([a-zA-Z0-9_-]+)"/);
         const title = titleM ? JSON.parse(`"${titleM[1]}"`) : '새 유튜브 레시피';
         const desc = descM ? JSON.parse(`"${descM[1]}"`) : '';
@@ -2243,9 +2241,9 @@
       }
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       if (isIOS) {
-        alert('📱 [아이폰 앱 설치 방법]\n\n1. Safari 하단 가운데 [공유(⬆️)] 버튼을 누릅니다.\n2. 메뉴를 내려 [홈 화면에 추가]를 누르면 바탕화면에 레시피북 앱이 설치됩니다!');
+        alert('📱 [아이폰 앱 설치 방법]\n\n1. Safari 하단 가운데 [공유(⬆️)] 버튼을 누릅니다.\\n2. 메뉴를 내려 [홈 화면에 추가]를 누르면 바탕화면에 레시피북 앱이 설치됩니다!');
       } else {
-        alert('📱 [스마트폰 앱 설치 방법]\n\n• 크롬 / 삼성 인터넷 메뉴 [⋮] 또는 [≡] 터치\n• [앱 설치] 또는 [홈 화면에 추가]를 누르면 스마트폰 어플로 설치됩니다!');
+        alert('📱 [스마트폰 앱 설치 방법]\n\n• 크롬 / 삼성 인터넷 메뉴 [⋮] 또는 [≡] 터치\\n• [앱 설치] 또는 [홈 화면에 추가]를 누르면 스마트폰 어플로 설치됩니다!');
       }
     }
 
